@@ -1,20 +1,42 @@
 import React, { FormHTMLAttributes, useState } from "react";
 import { useForm } from "react-hook-form";
 const TodoList = () => {
-  const { register, watch, handleSubmit, formState } = useForm();
-  console.log(register("toDo"));
+  interface IForm {
+    email: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    password: string;
+    password1: string;
+  }
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IForm>();
   const onValid = (data: any) => {
     console.log(data);
   };
   console.log(watch());
-  console.log(formState.errors);
+  console.log(errors);
   return (
     <>
       <form
         style={{ display: "flex", flexDirection: "column" }}
         onSubmit={handleSubmit(onValid)}
       >
-        <input {...register("email", { required: true })} placeholder="Email" />
+        <input
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[A-Za-z0-9._%+-]+@naver.com$/,
+              message: "Only naver.com emails allowed",
+            },
+          })}
+          placeholder="Email"
+        />
+        <span>{errors?.email?.message}</span>
         <input
           {...register("firstName", { required: true })}
           placeholder="First Name"

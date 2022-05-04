@@ -1,72 +1,51 @@
-import React, { FormHTMLAttributes, useState } from "react";
 import { useForm } from "react-hook-form";
-const TodoList = () => {
-  interface IForm {
-    email: string;
-    firstName: string;
-    lastName: string;
-    username: string;
-    password: string;
-    password1: string;
-  }
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IForm>();
-  const onValid = (data: any) => {
-    console.log(data);
+import { atom, useRecoilState } from "recoil";
+
+interface IForm {
+  toDo: string;
+}
+
+interface IToDo {
+  text: string;
+  id: number;
+  category: "TO_DO" | "DOING" | "DONE";
+}
+
+const toDoState = atom<IToDo[]>({
+  key: "toDo",
+  default: [],
+});
+
+function ToDoList() {
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const handleValid = ({ toDo }: IForm) => {
+    setToDos((oldToDos) => [
+      { text: toDo, id: Date.now(), category: "TO_DO" },
+      ...oldToDos,
+    ]);
+    setValue("toDo", "");
   };
-  console.log(watch());
-  console.log(errors);
   return (
-    <>
-      <form
-        style={{ display: "flex", flexDirection: "column" }}
-        onSubmit={handleSubmit(onValid)}
-      >
+    <div>
+      <h1>To Dos</h1>
+      <hr />
+      <form onSubmit={handleSubmit(handleValid)}>
         <input
-          {...register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Za-z0-9._%+-]+@naver.com$/,
-              message: "Only naver.com emails allowed",
-            },
+          {...register("toDo", {
+            required: "Please write a To Do",
           })}
-          placeholder="Email"
-        />
-        <span>{errors?.email?.message}</span>
-        <input
-          {...register("firstName", { required: true })}
-          placeholder="First Name"
-        />
-        <input
-          {...register("lastName", { required: true })}
-          placeholder="Last Name"
-        />
-        <input
-          {...register("username", { required: true, minLength: 10 })}
-          placeholder="Username"
-        />
-        <input
-          {...register("password", { required: true, minLength: 5 })}
-          placeholder="Password"
-        />
-        <input
-          {...register("password1", {
-            required: "Password is required",
-            minLength: {
-              value: 5,
-              message: "Your password is too short.",
-            },
-          })}
-          placeholder="Password1"
+          placeholder="Write a to do"
         />
         <button>Add</button>
       </form>
-    </>
+      <ul>
+        {toDos.map((toDo) => (
+          <li key={toDo.id}>{toDo.text}</li>
+        ))}
+      </ul>
+    </div>
   );
-};
+}
 
-export default TodoList;
+export default ToDoList;

@@ -8,7 +8,7 @@ import Todo from "./Todo";
 //시스템에서 아톰들을 구분할때 변수명 x 키값 으로함
 function ToDoList() {
   const toDos = useRecoilValue(toDoState);
-
+  console.log(toDos);
   return (
     <div>
       <h1>To Dos</h1>
